@@ -1,9 +1,0 @@
-$ npm i express
-$ npm i -D nodemon
-
-$ npm run start
-
-$ npm i -D typescript ts-node
-
-# install TypeScript declaration files (type definitions)
-$ npm i -D @types/node @types/express 
