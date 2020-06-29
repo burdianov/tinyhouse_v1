@@ -13,5 +13,5 @@ export interface Listing {
 }
 
 export interface Database {
-  listings: Collection;
+  listings: Collection<Listing>;
 }
