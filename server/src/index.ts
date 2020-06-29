@@ -3,7 +3,7 @@ import { ApolloServer } from 'apollo-server-express';
 import { typeDefs, resolvers } from './graphql';
 import { connectDatabase } from './database/index';
 
-const port = 9000;
+const port = process.env.PORT || 9000;
 
 const mount = async (app: Application) => {
   const db = await connectDatabase();
