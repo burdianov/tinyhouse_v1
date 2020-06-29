@@ -1,7 +1,6 @@
 import express, { Application } from 'express';
 import { ApolloServer } from 'apollo-server-express';
-import { typeDefs } from './graphql/typeDefs';
-import { resolvers } from './graphql/resolvers';
+import { typeDefs, resolvers } from './graphql';
 import { connectDatabase } from './database/index';
 
 const port = 9000;
