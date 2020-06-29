@@ -8,7 +8,8 @@ export const typeDefs = gql`
     address: String!
     price: Int!
     numOfGuests: Int!
-    numOfBaths: Int!
+    numOfBeds: Int!
+	numOfBaths: Int!
     rating: Int!
   }
 
