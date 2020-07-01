@@ -1,4 +1,5 @@
-import { useReducer, useEffect, useCallback } from 'react';
+import { useReducer } from 'react';
+
 import { server } from './server';
 
 interface State<TData> {
@@ -6,15 +7,15 @@ interface State<TData> {
   loading: boolean;
   error: boolean;
 }
-
 type Action<TData> =
   | { type: 'FETCH' }
   | { type: 'FETCH_SUCCESS'; payload: TData }
   | { type: 'FETCH_ERROR' };
 
-interface QueryResult<TData> extends State<TData> {
-  refetch: () => void;
-}
+type MutationTuple<TData, TVariables> = [
+  (variables?: TVariables | undefined) => Promise<void>,
+  State<TData>
+];
 
 const reducer = <TData>() => (
   state: State<TData>,
@@ -44,7 +45,9 @@ const reducer = <TData>() => (
   }
 };
 
-export const useQuery = <TData = any>(query: string): QueryResult<TData> => {
+export const useMutation = <TData = any, TVariables = any>(
+  query: string
+): MutationTuple<TData, TVariables> => {
   const fetchReducer = reducer<TData>();
   const [state, dispatch] = useReducer(fetchReducer, {
     data: null,
@@ -52,28 +55,25 @@ export const useQuery = <TData = any>(query: string): QueryResult<TData> => {
     error: false
   });
 
-  const fetch = useCallback(() => {
-    const fetchApi = async () => {
-      try {
-        dispatch({ type: 'FETCH' });
-        const { data, errors } = await server.fetch<TData>({ query });
+  const fetch = async (variables?: TVariables) => {
+    try {
+      dispatch({ type: 'FETCH' });
 
-        if (errors && errors.length) {
-          throw new Error(errors[0].message);
-        }
+      const { data, errors } = await server.fetch<TData, TVariables>({
+        query,
+        variables
+      });
 
-        dispatch({ type: 'FETCH_SUCCESS', payload: data });
-      } catch (err) {
-        dispatch({ type: 'FETCH_ERROR' });
-        throw console.log(err);
+      if (errors && errors.length) {
+        throw new Error(errors[0].message);
       }
-    };
-    fetchApi();
-  }, [query]);
 
-  useEffect(() => {
-    fetch();
-  }, [fetch]);
+      dispatch({ type: 'FETCH_SUCCESS', payload: data });
+    } catch (err) {
+      dispatch({ type: 'FETCH_ERROR' });
+      throw console.error(err);
+    }
+  };
 
-  return { ...state, refetch: fetch };
+  return [fetch, state];
 };
